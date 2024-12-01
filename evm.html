@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Voting Machine (EVM)</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1, h2 {
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            width: 80%;
+            margin: 10px 0;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #1e90ff;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .candidate {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .candidate span {
+            width: 60%;
+        }
+        .candidate img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Electronic Voting Machine</h1>
+
+    <!-- Candidate Entry Section -->
+    <div id="candidate-entry">
+        <h2>Enter Candidate Details</h2>
+        <input type="text" id="candidate-name" placeholder="Candidate Name" required>
+        <input type="text" id="candidate-party" placeholder="Party Name" required>
+        <input type="text" id="candidate-symbol" placeholder="Symbol (Single Character)" required>
+        <button onclick="addCandidate()">Add Candidate</button>
+        <input type="password" id="vote-password" placeholder="Set Voting Password" required>
+        <input type="password" id="result-password" placeholder="Set Result Password" required>
+        <button onclick="startVoting()">Start Voting</button>
+    </div>
+
+    <!-- Voting Section -->
+    <div id="voting-section" style="display: none;">
+        <h2>Vote for Your Candidate</h2>
+        <div id="candidate-list"></div>
+        <button onclick="stopVoting()">Stop Voting</button>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result-section" style="display: none;">
+        <h2>Election Results</h2>
+        <div id="result-list"></div>
+    </div>
+</div>
+
+<script>
+    let candidates = [];
+    let votingPassword;
+    let resultPassword;
+
+    function addCandidate() {
+        const name = document.getElementById('candidate-name').value;
+        const party = document.getElementById('candidate-party').value;
+        const symbol = document.getElementById('candidate-symbol').value;
+
+        if (name && party && symbol) {
+            candidates.push({ name, party, symbol, votes: 0 });
+            alert(`${name} added successfully!`);
+            document.getElementById('candidate-name').value = "";
+            document.getElementById('candidate-party').value = "";
+            document.getElementById('candidate-symbol').value = "";
+        } else {
+            alert("Please fill all details.");
+        }
+    }
+
+    function startVoting() {
+        votingPassword = document.getElementById('vote-password').value;
+        resultPassword = document.getElementById('result-password').value;
+
+        if (!votingPassword || !resultPassword || candidates.length === 0) {
+            alert("Please add candidates and set passwords.");
+            return;
+        }
+
+        document.getElementById('candidate-entry').style.display = 'none';
+        document.getElementById('voting-section').style.display = 'block';
+
+        let candidateList = "";
+        candidates.forEach((candidate, index) => {
+            candidateList += `
+                <div class="candidate">
+                    <span>${candidate.name} (${candidate.party}) - ${candidate.symbol}</span>
+                    <button onclick="vote(${index})">Vote</button>
+                </div>
+            `;
+        });
+        document.getElementById('candidate-list').innerHTML = candidateList;
+    }
+
+    function vote(index) {
+        candidates[index].votes += 1;
+        alert(`You voted for ${candidates[index].name}`);
+    }
+
+    function stopVoting() {
+        const inputPassword = prompt("Enter the Voting Password:");
+        if (inputPassword === votingPassword) {
+            document.getElementById('voting-section').style.display = 'none';
+            document.getElementById('result-section').style.display = 'block';
+
+            let resultList = "";
+            candidates.forEach(candidate => {
+                resultList += `
+                    <p>
+                        <strong>Candidate:</strong> ${candidate.name}<br>
+                        <strong>Party:</strong> ${candidate.party}<br>
+                        <strong>Symbol:</strong> ${candidate.symbol}<br>
+                        <strong>Total Votes:</strong> ${candidate.votes}
+                    </p><hr>
+                `;
+            });
+            document.getElementById('result-list').innerHTML = resultList;
+        } else {
+            alert("Incorrect Password!");
+        }
+    }
+</script>
+
+</body>
+</html>
